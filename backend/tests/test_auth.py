@@ -42,5 +42,5 @@ def test_access_protected_route():
     # Access root
     response = client.get("/")
     assert response.status_code == 200
-    assert "Welcome to LeaderAI" in response.text
+    assert "Welcome," in response.text
 

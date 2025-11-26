@@ -39,7 +39,7 @@ async def new_project_form(
 async def create_project(
     request: Request,
     name: str = Form(...),
-    status: str = Form(...),
+    project_status: str = Form(..., alias="status"),
     description: str = Form(None),
     stakeholders: str = Form(""), # Comma separated
     db: AsyncSession = Depends(get_db),
@@ -49,7 +49,7 @@ async def create_project(
     
     new_project = Project(
         name=name,
-        status=status,
+        status=project_status,
         description=description,
         stakeholders=stakeholder_list
     )

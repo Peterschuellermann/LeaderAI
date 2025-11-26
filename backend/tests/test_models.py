@@ -1,5 +1,6 @@
 import pytest
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from app.models import Employee, Project, ProjectAssignment, Goal
 
 @pytest.mark.asyncio
@@ -41,14 +42,10 @@ async def test_project_assignment_relationship(db_session):
     db_session.add(assignment)
     await db_session.commit()
     
-    # Verify relationships
-    result = await db_session.execute(select(Project).filter_by(name="Project X"))
+    # Verify relationships with eager loading
+    stmt = select(Project).options(selectinload(Project.assignments)).filter_by(name="Project X")
+    result = await db_session.execute(stmt)
     saved_proj = result.scalar_one()
-    
-    # Force load assignments
-    # In a real app we'd likely use selectinload options, but for this unit test access on attached session is enough if session is open
-    # However, since we might need to refresh or handle lazy loading in async:
-    await db_session.refresh(saved_proj, ["assignments"])
     
     assert len(saved_proj.assignments) == 1
     assert saved_proj.assignments[0].role == "Lead"

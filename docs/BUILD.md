@@ -44,3 +44,19 @@ docker-compose build
 ### CI/CD
 *   GitHub Actions are configured in `.github/workflows/test.yml` to run tests on every push.
 
+## Local Development Setup
+
+For local development without Docker, ensure you have Python 3.11+ installed.
+
+1.  **Dependencies**:
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install -r backend/requirements.txt
+    ```
+    *Note: `requirements.txt` includes `greenlet` and `email-validator` which are required for the async database driver and validation.*
+
+2.  **Running**:
+    ```bash
+    cd backend && uvicorn app.main:app --reload
+    ```
