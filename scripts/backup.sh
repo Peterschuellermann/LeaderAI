@@ -3,7 +3,7 @@ set -e
 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 BACKUP_DIR="./backups"
-DB_FILE="backend/leaderai.db"
+DB_FILE="leaderai.db"
 BACKUP_FILE="$BACKUP_DIR/leaderai_backup_$TIMESTAMP.db"
 
 mkdir -p "$BACKUP_DIR"

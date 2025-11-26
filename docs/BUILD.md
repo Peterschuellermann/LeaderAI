@@ -16,7 +16,7 @@ docker-compose build
 ### Steps
 
 1.  **Copy Files**:
-    Copy `docker-compose.yml` and the `backend/` folder to your server.
+    Copy `docker-compose.yml` and the source code to your server.
     *   *Better*: Clone the repo on the server.
 
 2.  **Configure Environment**:
@@ -37,8 +37,8 @@ docker-compose build
     Visit `http://your-server-ip:8000`
 
 ### Data Persistence
-*   The SQLite database is stored in `backend/leaderai.db`.
-*   The `docker-compose.yml` maps the `backend` directory to the container, so the DB file persists on the host.
+*   The SQLite database is stored in `leaderai.db`.
+*   The `docker-compose.yml` maps the root directory to the container, so the DB file persists on the host.
 *   **Backup**: Run `./scripts/backup.sh` periodically (add to cron).
 
 ### CI/CD
@@ -52,11 +52,11 @@ For local development without Docker, ensure you have Python 3.11+ installed.
     ```bash
     python3 -m venv venv
     source venv/bin/activate
-    pip install -r backend/requirements.txt
+    pip install -r requirements.txt
     ```
     *Note: `requirements.txt` includes `greenlet` and `email-validator` which are required for the async database driver and validation.*
 
 2.  **Running**:
     ```bash
-    cd backend && uvicorn app.main:app --reload
+    uvicorn app.main:app --reload
     ```

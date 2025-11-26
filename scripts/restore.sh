@@ -7,7 +7,7 @@ if [ -z "$1" ]; then
 fi
 
 BACKUP_FILE="$1"
-DB_FILE="backend/leaderai.db"
+DB_FILE="leaderai.db"
 
 if [ ! -f "$BACKUP_FILE" ]; then
     echo "Backup file not found: $BACKUP_FILE"

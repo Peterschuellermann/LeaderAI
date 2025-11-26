@@ -2,11 +2,11 @@ version: '3.8'
 
 services:
   web:
-    build: ./backend
+    build: .
     ports:
       - "8000:8000"
     volumes:
-      - ./backend:/app
+      - .:/app
     environment:
       - DATABASE_URL=sqlite+aiosqlite:///./leaderai.db
       - SECRET_KEY=dev_secret_key_change_in_prod

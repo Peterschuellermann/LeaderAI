@@ -4,10 +4,10 @@ ready: lint test
 
 
 test:
-	cd backend && PYTHONPATH=. pytest
+	PYTHONPATH=. pytest
 
 lint:
-	cd backend && ruff check . && mypy --explicit-package-bases .
+	ruff check . && mypy --explicit-package-bases .
 
 run:
 	docker-compose up --build

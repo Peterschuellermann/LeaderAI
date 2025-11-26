@@ -39,12 +39,11 @@ If you want to develop locally without Docker:
 
 2.  **Install Dependencies**:
     ```bash
-    pip install -r backend/requirements.txt
+    pip install -r requirements.txt
     ```
 
 3.  **Run the Server**:
     ```bash
-    cd backend
     uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
     ```
 
@@ -76,7 +75,7 @@ To run the test suite (ensure you are in your virtual environment or using Docke
 
 ```bash
 # Local (with venv activated)
-cd backend && pytest
+pytest
 
 # OR using Make (if dependencies are installed)
 make test
@@ -87,7 +86,7 @@ make ready
 
 ## 🛠 Configuration
 
-Create a `.env` file in the `backend/` directory (or use environment variables in Docker):
+Create a `.env` file in the root directory (or use environment variables in Docker):
 
 ```env
 SECRET_KEY=your_secure_secret
