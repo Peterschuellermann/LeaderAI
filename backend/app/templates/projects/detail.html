@@ -1,13 +1,27 @@
 {% extends "layout.html" %}
 
 {% block content %}
+<script>
+    function toggleEdit(id) {
+        const viewEl = document.getElementById('view-' + id);
+        const editEl = document.getElementById('edit-' + id);
+        if (viewEl && editEl) {
+            viewEl.classList.toggle('hidden');
+            editEl.classList.toggle('hidden');
+        }
+    }
+</script>
+
 <div class="bg-white shadow overflow-hidden sm:rounded-lg mb-8">
     <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
         <div>
             <h3 class="text-lg leading-6 font-medium text-gray-900">Project Details</h3>
             <p class="mt-1 max-w-2xl text-sm text-gray-500">Overview and assignments.</p>
         </div>
-        <div>
+        <div class="flex space-x-2">
+            <button onclick="toggleEdit('project')" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm">
+                Edit Project
+            </button>
              <form action="/projects/{{ project.id }}/delete" method="post" onsubmit="return confirm('Are you sure?');">
                 <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded text-sm">
                     Delete Project
@@ -16,33 +30,81 @@
         </div>
     </div>
     <div class="border-t border-gray-200">
-        <dl>
-            <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-gray-500">Name</dt>
-                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ project.name }}</dd>
+        <!-- View Mode -->
+        <div id="view-project">
+            <dl>
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Name</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ project.name }}</dd>
+                </div>
+                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Status</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if project.status == 'Active' %}bg-green-100 text-green-800{% endif %}
+                            {% if project.status == 'On Hold' %}bg-yellow-100 text-yellow-800{% endif %}
+                            {% if project.status == 'Completed' %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ project.status }}
+                        </span>
+                    </dd>
+                </div>
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Description</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ project.description }}</dd>
+                </div>
+                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">Stakeholders</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        {{ project.stakeholders | join(', ') }}
+                    </dd>
+                </div>
+            </dl>
+        </div>
+        
+        <!-- Edit Mode -->
+        <form id="edit-project" action="/projects/{{ project.id }}/update" method="post" class="hidden bg-gray-50 p-6">
+            <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                <div class="sm:col-span-4">
+                    <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
+                    <div class="mt-1">
+                        <input type="text" name="name" id="name" value="{{ project.name }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2">
+                    </div>
+                </div>
+
+                <div class="sm:col-span-3">
+                    <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
+                    <div class="mt-1">
+                        <select id="status" name="status" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2">
+                            <option value="Active" {% if project.status == 'Active' %}selected{% endif %}>Active</option>
+                            <option value="On Hold" {% if project.status == 'On Hold' %}selected{% endif %}>On Hold</option>
+                            <option value="Completed" {% if project.status == 'Completed' %}selected{% endif %}>Completed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="sm:col-span-6">
+                    <label for="description" class="block text-sm font-medium text-gray-700">Description</label>
+                    <div class="mt-1">
+                        <textarea id="description" name="description" rows="3" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border border-gray-300 rounded-md p-2">{{ project.description }}</textarea>
+                    </div>
+                </div>
+
+                <div class="sm:col-span-6">
+                    <label for="stakeholders" class="block text-sm font-medium text-gray-700">Stakeholders (comma separated)</label>
+                    <div class="mt-1">
+                        <input type="text" name="stakeholders" id="stakeholders" value="{{ project.stakeholders | join(', ') }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-2">
+                    </div>
+                </div>
             </div>
-            <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-gray-500">Status</dt>
-                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                        {% if project.status == 'Active' %}bg-green-100 text-green-800{% endif %}
-                        {% if project.status == 'On Hold' %}bg-yellow-100 text-yellow-800{% endif %}
-                        {% if project.status == 'Completed' %}bg-gray-100 text-gray-800{% endif %}">
-                        {{ project.status }}
-                    </span>
-                </dd>
+            <div class="mt-4 flex justify-end space-x-2">
+                 <button type="button" onclick="toggleEdit('project')" class="bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Cancel
+                </button>
+                <button type="submit" class="ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                    Save
+                </button>
             </div>
-            <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-gray-500">Description</dt>
-                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ project.description }}</dd>
-            </div>
-            <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-gray-500">Stakeholders</dt>
-                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    {{ project.stakeholders | join(', ') }}
-                </dd>
-            </div>
-        </dl>
+        </form>
     </div>
 </div>
 
@@ -57,7 +119,7 @@
             <ul role="list" class="-my-5 divide-y divide-gray-200">
                 {% for assignment in project.assignments %}
                 <li class="py-4">
-                    <div class="flex items-center space-x-4">
+                    <div id="view-assignment-{{ assignment.id }}" class="flex items-center justify-between">
                         <div class="flex-1 min-w-0">
                             <p class="text-sm font-medium text-gray-900 truncate">
                                 <a href="/employees/{{ assignment.employee.id }}" class="hover:underline">
@@ -68,7 +130,28 @@
                                 {{ assignment.role }} ({{ assignment.capacity }}%)
                             </p>
                         </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="toggleEdit('assignment-{{ assignment.id }}')" class="text-indigo-600 hover:text-indigo-900 text-sm font-medium">Edit</button>
+                            <form action="/projects/{{ project.id }}/assignments/{{ assignment.id }}/delete" method="post" onsubmit="return confirm('Remove this assignment?');">
+                                <button type="submit" class="text-red-600 hover:text-red-900 text-sm font-medium">Delete</button>
+                            </form>
+                        </div>
                     </div>
+                    
+                    <!-- Edit Assignment Form -->
+                    <form id="edit-assignment-{{ assignment.id }}" action="/projects/{{ project.id }}/assignments/{{ assignment.id }}/update" method="post" class="hidden flex items-center space-x-2">
+                         <div class="flex-1">
+                            <span class="text-sm font-medium text-gray-900">{{ assignment.employee.name }}</span>
+                        </div>
+                        <div class="w-32">
+                            <input type="text" name="role" value="{{ assignment.role }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-1" placeholder="Role">
+                        </div>
+                        <div class="w-20">
+                            <input type="number" name="capacity" value="{{ assignment.capacity }}" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md p-1" placeholder="%">
+                        </div>
+                        <button type="submit" class="text-green-600 hover:text-green-900 text-sm font-medium">Save</button>
+                        <button type="button" onclick="toggleEdit('assignment-{{ assignment.id }}')" class="text-gray-600 hover:text-gray-900 text-sm font-medium">Cancel</button>
+                    </form>
                 </li>
                 {% else %}
                 <li class="py-4 text-gray-500 text-sm">No one assigned yet.</li>
@@ -101,5 +184,3 @@
     </div>
 </div>
 {% endblock %}
-
-

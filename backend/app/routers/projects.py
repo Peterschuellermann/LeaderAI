@@ -92,6 +92,30 @@ async def project_detail(
         }
     )
 
+@router.post("/{project_id}/update")
+async def update_project(
+    project_id: int,
+    name: str = Form(...),
+    project_status: str = Form(..., alias="status"),
+    description: str = Form(None),
+    stakeholders: str = Form(""),
+    db: AsyncSession = Depends(get_db),
+    user: str = Depends(get_current_user)
+):
+    result = await db.execute(select(Project).filter(Project.id == project_id))
+    project = result.scalar_one_or_none()
+
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    project.name = name
+    project.status = project_status
+    project.description = description
+    project.stakeholders = [s.strip() for s in stakeholders.split(",") if s.strip()]
+
+    await db.commit()
+    return RedirectResponse(url=f"/projects/{project_id}", status_code=status.HTTP_303_SEE_OTHER)
+
 @router.post("/{project_id}/assign")
 async def assign_employee(
     project_id: int,
@@ -111,6 +135,38 @@ async def assign_employee(
     await db.commit()
     return RedirectResponse(url=f"/projects/{project_id}", status_code=status.HTTP_303_SEE_OTHER)
 
+@router.post("/{project_id}/assignments/{assignment_id}/update")
+async def update_assignment(
+    project_id: int,
+    assignment_id: int,
+    role: str = Form(...),
+    capacity: int = Form(...),
+    db: AsyncSession = Depends(get_db),
+    user: str = Depends(get_current_user)
+):
+    result = await db.execute(select(ProjectAssignment).filter(ProjectAssignment.id == assignment_id))
+    assignment = result.scalar_one_or_none()
+
+    if not assignment:
+        raise HTTPException(status_code=404, detail="Assignment not found")
+
+    assignment.role = role
+    assignment.capacity = capacity
+
+    await db.commit()
+    return RedirectResponse(url=f"/projects/{project_id}", status_code=status.HTTP_303_SEE_OTHER)
+
+@router.post("/{project_id}/assignments/{assignment_id}/delete")
+async def delete_assignment(
+    project_id: int,
+    assignment_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: str = Depends(get_current_user)
+):
+    await db.execute(delete(ProjectAssignment).where(ProjectAssignment.id == assignment_id))
+    await db.commit()
+    return RedirectResponse(url=f"/projects/{project_id}", status_code=status.HTTP_303_SEE_OTHER)
+
 @router.post("/{project_id}/delete")
 async def delete_project(
     project_id: int,
@@ -120,4 +176,3 @@ async def delete_project(
     await db.execute(delete(Project).where(Project.id == project_id))
     await db.commit()
     return RedirectResponse(url="/projects", status_code=status.HTTP_303_SEE_OTHER)
-
