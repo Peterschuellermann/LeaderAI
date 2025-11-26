@@ -4,6 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
 from app.auth import router as auth_router, get_current_user
+from app.routers import employees
 
 app = FastAPI(title="LeaderAI")
 
@@ -14,8 +15,9 @@ app.mount("/static", StaticFiles(directory=static_path), name="static")
 # Templates
 templates = Jinja2Templates(directory=Path(__file__).parent / "templates")
 
-# Include Auth Router
+# Include Routers
 app.include_router(auth_router)
+app.include_router(employees.router)
 
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
