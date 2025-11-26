@@ -1,8 +1,9 @@
-from fastapi import FastAPI, Request, Depends, status
+from fastapi import FastAPI, Request, Depends, status, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
+import aiofiles
 from app.auth import router as auth_router, get_current_user
 from app.routers import employees, projects, goals
 
@@ -39,3 +40,23 @@ async def auth_middleware(request: Request, call_next):
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request, user: str = Depends(get_current_user)):
     return templates.TemplateResponse("index.html", {"request": request, "title": "LeaderAI", "user": user})
+
+@app.get("/feedback", response_class=HTMLResponse)
+async def feedback_form(request: Request, user: str = Depends(get_current_user)):
+    return templates.TemplateResponse("feedback.html", {"request": request, "user": user})
+
+@app.post("/feedback", response_class=HTMLResponse)
+async def submit_feedback(
+    request: Request, 
+    feedback: str = Form(...),
+    user: str = Depends(get_current_user)
+):
+    # Simple file append logging for MVP
+    async with aiofiles.open("feedback.log", mode="a") as f:
+        await f.write(f"User: {user} | Feedback: {feedback}\n")
+    
+    return templates.TemplateResponse("feedback.html", {
+        "request": request, 
+        "user": user,
+        "message": "Thank you for your feedback!"
+    })
