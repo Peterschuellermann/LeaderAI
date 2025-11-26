@@ -6,4 +6,4 @@ __pycache__
 venv/
 .env
 leaderai.db
-
+fix_lints.ipynb
