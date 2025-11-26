@@ -18,3 +18,4 @@ echo "Restoring database from $BACKUP_FILE..."
 cp "$BACKUP_FILE" "$DB_FILE"
 echo "Database restored successfully."
 
+

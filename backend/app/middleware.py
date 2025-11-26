@@ -16,3 +16,4 @@ class CSRFMiddleware(BaseHTTPMiddleware):
         response = await call_next(request)
         return response
 
+

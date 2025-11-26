@@ -15,3 +15,4 @@ To provide a lightweight, "zero-friction" tool for Engineering Managers and Team
 *   **SQLite**: Zero-config database, sufficient for single-team usage. Easy to backup.
 *   **TailwindCSS**: Utility-first styling for rapid UI development.
 
+

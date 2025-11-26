@@ -20,3 +20,4 @@ fi
 # Clean up old backups (keep last 7 days)
 find "$BACKUP_DIR" -name "leaderai_backup_*.db" -mtime +7 -delete
 
+

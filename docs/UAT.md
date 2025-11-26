@@ -39,3 +39,4 @@ Use this script to validate the application meets your needs.
 1.  **Backup**: Run `./scripts/backup.sh` in your terminal.
     *   *Pass*: A `.db` file is created in `backups/`.
 
+
