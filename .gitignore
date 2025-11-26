@@ -7,3 +7,4 @@ venv/
 .env
 leaderai.db
 fix_lints.ipynb
+backend/feedback.log

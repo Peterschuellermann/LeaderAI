@@ -23,19 +23,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r backend/requirements.txt
         
-    - name: Lint with Ruff
-      run: |
-        cd backend
-        ruff check .
-        
-    - name: Type check with Mypy
-      run: |
-        cd backend
-        mypy .
+    - name: Lint (Ruff + Mypy)
+      run: make lint
         
     - name: Run tests
-      run: |
-        cd backend
-        pytest
+      run: make test
 
 
