@@ -1,0 +1,58 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">Projects</h2>
+    <a href="/projects/new" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+        Create Project
+    </a>
+</div>
+
+<!-- Dashboard Summary -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    <div class="bg-white p-4 rounded shadow border-l-4 border-blue-500">
+        <h3 class="font-bold text-gray-700">Total Projects</h3>
+        <p class="text-2xl">{{ projects|length }}</p>
+    </div>
+    <!-- Could add more calculated stats here -->
+</div>
+
+<div class="bg-white shadow overflow-hidden sm:rounded-md">
+    <ul role="list" class="divide-y divide-gray-200">
+        {% for project in projects %}
+        <li>
+            <a href="/projects/{{ project.id }}" class="block hover:bg-gray-50">
+                <div class="px-4 py-4 sm:px-6">
+                    <div class="flex items-center justify-between">
+                        <p class="text-sm font-medium text-blue-600 truncate">{{ project.name }}</p>
+                        <div class="ml-2 flex-shrink-0 flex">
+                            <p class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                {% if project.status == 'Active' %}bg-green-100 text-green-800{% endif %}
+                                {% if project.status == 'On Hold' %}bg-yellow-100 text-yellow-800{% endif %}
+                                {% if project.status == 'Completed' %}bg-gray-100 text-gray-800{% endif %}">
+                                {{ project.status }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="mt-2 sm:flex sm:justify-between">
+                        <div class="sm:flex">
+                            <p class="flex items-center text-sm text-gray-500 truncate">
+                                {{ project.description }}
+                            </p>
+                        </div>
+                        <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
+                            <p>Stakeholders: {{ project.stakeholders | join(', ') }}</p>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </li>
+        {% else %}
+        <li class="px-4 py-4 sm:px-6 text-gray-500 text-center">
+            No projects found. Click "Create Project" to start.
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}
+
