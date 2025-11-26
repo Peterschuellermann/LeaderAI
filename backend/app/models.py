@@ -50,8 +50,12 @@ class Goal(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String)
-    description = Column(Text)
+    description = Column(Text) # Objective
     status = Column(String, default="Pending") # Pending, In Progress, Achieved
+    
+    due_date = Column(String, nullable=True)
+    success_metrics = Column(Text, nullable=True)
+    manager_support = Column(Text, nullable=True)
     
     employee_id = Column(Integer, ForeignKey("employees.id"), nullable=True)
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=True)

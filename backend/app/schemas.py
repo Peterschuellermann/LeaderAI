@@ -25,3 +25,23 @@ class EmployeeOut(EmployeeBase):
     class Config:
         from_attributes = True
 
+class GoalBase(BaseModel):
+    title: str
+    description: str # Objective
+    due_date: Optional[str] = None
+    success_metrics: Optional[str] = None
+    manager_support: Optional[str] = None
+    status: str = "Pending"
+
+class GoalCreate(GoalBase):
+    employee_id: int
+    project_id: Optional[int] = None
+
+class GoalOut(GoalBase):
+    id: int
+    employee_id: Optional[int] = None
+    project_id: Optional[int] = None
+    ai_suggestions: Optional[str] = None
+
+    class Config:
+        from_attributes = True

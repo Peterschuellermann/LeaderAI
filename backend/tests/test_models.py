@@ -61,7 +61,10 @@ async def test_goal_creation(db_session):
         title="Learn Rust",
         description="Complete rustlings",
         employee_id=emp.id,
-        status="Pending"
+        status="Pending",
+        due_date="Q4 2024",
+        success_metrics="Complete 50 exercises",
+        manager_support="Provide time"
     )
     db_session.add(goal)
     await db_session.commit()
@@ -70,4 +73,7 @@ async def test_goal_creation(db_session):
     saved_goal = result.scalar_one()
     
     assert saved_goal.employee_id == emp.id
+    assert saved_goal.due_date == "Q4 2024"
+    assert saved_goal.success_metrics == "Complete 50 exercises"
+    assert saved_goal.manager_support == "Provide time"
 

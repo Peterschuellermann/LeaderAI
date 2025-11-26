@@ -46,6 +46,9 @@ async def create_goal(
     title: str = Form(...),
     description: str = Form(...),
     employee_id: int = Form(...),
+    due_date: Optional[str] = Form(None),
+    success_metrics: Optional[str] = Form(None),
+    manager_support: Optional[str] = Form(None),
     db: AsyncSession = Depends(get_db),
     user: str = Depends(get_current_user)
 ):
@@ -53,6 +56,9 @@ async def create_goal(
         title=title,
         description=description,
         employee_id=employee_id,
+        due_date=due_date,
+        success_metrics=success_metrics,
+        manager_support=manager_support,
         status="Pending"
     )
     db.add(goal)
@@ -71,7 +77,10 @@ async def run_goal_generation_task(task_id: str, employee_id: int, project_id: i
 async def process_ai_request(task_id: str, employee_context: str, project_context: str, potential: str = None):
     llm = get_llm_service()
     result = await llm.generate_goals(employee_context, project_context, potential)
-    tasks[task_id] = {"status": "completed", "result": result}
+    # Update task with result
+    if task_id in tasks:
+        tasks[task_id]["status"] = "completed"
+        tasks[task_id]["result"] = result
 
 @router.post("/generate_suggestions")
 async def generate_suggestions(
@@ -99,7 +108,7 @@ async def generate_suggestions(
             proj_context = f"Project: {project.name}, Description: {project.description}"
 
     task_id = str(uuid.uuid4())
-    tasks[task_id] = {"status": "pending"}
+    tasks[task_id] = {"status": "pending", "employee_id": employee_id}
     
     background_tasks.add_task(process_ai_request, task_id, emp_context, proj_context, employee.potential)
     
@@ -131,7 +140,7 @@ async def get_task_status(request: Request, task_id: str):
         request=request,
         name="goals/suggestion_result.html",
         context={
-            "result": task["result"]
+            "result": task["result"],
+            "employee_id": task.get("employee_id")
         }
     )
-

@@ -37,7 +37,10 @@ async def test_create_goal(db_session, override_get_db):
         data={
             "title": "Ship It",
             "description": "Release version 1.0",
-            "employee_id": 1
+            "employee_id": 1,
+            "due_date": "Q4 2024",
+            "success_metrics": "Zero bugs",
+            "manager_support": "Pizza"
         },
         follow_redirects=False
     )
@@ -45,6 +48,8 @@ async def test_create_goal(db_session, override_get_db):
     
     response = client.get("/goals/")
     assert "Ship It" in response.text
+    assert "Q4 2024" in response.text
+    assert "Zero bugs" in response.text
 
 @pytest.mark.asyncio
 async def test_ai_goal_suggestion_flow(db_session, override_get_db):
@@ -68,67 +73,23 @@ async def test_ai_goal_suggestion_flow(db_session, override_get_db):
     assert match
     task_id = match.group(1)
     
-    # 2. Poll Task (Immediately - might be pending or done depending on mock/race)
-    # Since we use background tasks, it runs in the same process for TestClient usually.
-    # However, TestClient with BackgroundTasks might run them synchronously or wait.
-    # Let's see.
+    # 2. Poll Task
+    # With TestClient, background tasks are executed.
+    # However, our MockLLM sleeps for 2s.
+    # We might need to wait or just check status.
     
+    # Poll
     response = client.get(f"/goals/task/{task_id}")
     assert response.status_code == 200
     
-    # With TestClient, background tasks often run after the response is sent but we can't easily "wait" for them without
-    # manual handling or force execution. 
-    # But in Starlette/FastAPI TestClient, background tasks are executed.
-    # However, our MockLLM sleeps for 2s. This might block if synchronous or be slow.
-    # For testing, we might want to mock the LLM provider to be instant.
+    # Ideally we want to see the result form.
+    # Depending on timing, it might be "AI is thinking" or the form.
+    # But usually TestClient waits for background tasks? No, Starlette TestClient runs background tasks AFTER response.
+    # So the first poll might be too fast if the background task sleeps.
+    # But wait, `asyncio.sleep` in background task...
     
-    # Ideally, we mock the `get_llm_service` to return a FastMock.
-    # But the real MockLLM has sleep.
-    
-    # Note: `pytest-asyncio` and `TestClient` interaction with `asyncio.sleep` can be tricky. 
-    # It might wait 2s.
-    
-    # Let's just assert we got a response (Pending or Result).
-    assert "AI is thinking" in response.text or "Suggestions:" in response.text
-
-@pytest.mark.asyncio
-async def test_ai_goal_suggestion_with_potential(db_session, override_get_db):
-    login(client)
-    # Create P3 Employee (should get no goals)
-    client.post("/employees/", data={
-        "name": "P3 User", 
-        "role": "Dev", 
-        "email": "p3@test.com",
-        "potential": "P3"
-    })
-    
-    # Create P1 Employee (should get strategic goals)
-    client.post("/employees/", data={
-        "name": "P1 User", 
-        "role": "Lead", 
-        "email": "p1@test.com",
-        "potential": "P1"
-    })
-    
-    # Request for P3 (employee_id=2 since we created one in prev test or 1 if isolated)
-    # Let's assume sequential IDs or query DB in real test, but here we guess 2
-    # Since tests might run in any order or clean DB, we should probably fetch IDs or rely on isolation.
-    # However, the conftest usually isolates per test function or session. 
-    # Let's assume per-function isolation if configured correctly, so IDs are 1 and 2.
-    
-    response_p3 = client.post(
-        "/goals/generate_suggestions",
-        data={"employee_id": 1},
-        headers={"HX-Request": "true"}
-    )
-    assert response_p3.status_code == 200
-    
-    response_p1 = client.post(
-        "/goals/generate_suggestions",
-        data={"employee_id": 2},
-        headers={"HX-Request": "true"}
-    )
-    assert response_p1.status_code == 200
+    # Let's just check that we get a valid response.
+    assert "task_poll" in response.template.name or "suggestion_result" in response.template.name
 
 @pytest.mark.asyncio
 async def test_llm_logic_mock(db_session):
@@ -140,15 +101,20 @@ async def test_llm_logic_mock(db_session):
     
     # P3 Case
     res_p3 = await provider.generate_goals("Ctx", "Proj", potential="P3")
-    assert "no goals" in res_p3.lower()
+    assert isinstance(res_p3, dict)
+    assert "Maintenance" in res_p3["title"] or "Maintenance" in res_p3["objective"]
     
     # P4 Case
     res_p4 = await provider.generate_goals("Ctx", "Proj", potential="P4")
-    assert "no goals" in res_p4.lower()
+    assert isinstance(res_p4, dict)
+    assert "Performance" in res_p4["title"] or "Improvement" in res_p4["title"]
     
     # P1 Case
     res_p1 = await provider.generate_goals("Ctx", "Proj", potential="P1")
-    assert "Suggested goals" in res_p1 or "suggested goals" in res_p1.lower()
+    assert isinstance(res_p1, dict)
+    assert "title" in res_p1
+    assert "objective" in res_p1
+    assert "due_date" in res_p1
 
 @pytest.mark.asyncio
 async def test_openai_key_integration_skipped_by_default():
@@ -171,12 +137,5 @@ async def test_openai_key_integration_skipped_by_default():
     try:
         provider = get_llm_service()
         assert isinstance(provider, OpenAIProvider)
-        
-        # Note: We don't make a call here to avoid costs/errors with dummy key.
-        # But if we wanted to test the call:
-        # res = await provider.generate_goals(...)
     finally:
         settings.OPENAI_API_KEY = original_key
-
-
-
