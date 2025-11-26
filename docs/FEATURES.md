@@ -22,4 +22,4 @@
 *   **Authentication**: Simple secure cookie-based login.
 *   **Self-Hostable**: Dockerized for easy deployment anywhere.
 *   **Data Safety**: Built-in backup scripts.
-
+*   **Development Seed Data**: Automatically seeds a "Test User" employee when running in non-production environments.
