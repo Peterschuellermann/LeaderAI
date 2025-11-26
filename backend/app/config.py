@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     ADMIN_USERNAME: str = "admin"
     ADMIN_PASSWORD: str = "password"
     OPENAI_API_KEY: Optional[str] = None
+    ENVIRONMENT: str = "development"
     
     model_config = ConfigDict(env_file=".env")
 

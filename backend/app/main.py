@@ -4,10 +4,39 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
 import aiofiles
+from sqlalchemy import select
+from contextlib import asynccontextmanager
+
 from app.auth import router as auth_router, get_current_user
 from app.routers import employees, projects, goals
+from app.config import settings
+from app.database import SessionLocal
+from app.models import Employee
 
-app = FastAPI(title="LeaderAI")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    if settings.ENVIRONMENT != "production":
+        async with SessionLocal() as session:
+            result = await session.execute(select(Employee).filter_by(email="test@example.com"))
+            existing_user = result.scalar_one_or_none()
+            
+            if not existing_user:
+                test_user = Employee(
+                    name="Test User",
+                    role="Tester",
+                    email="test@example.com",
+                    skills=["Manual Testing", "Bug Hunting"],
+                    notes="Created automatically for development/testing."
+                )
+                session.add(test_user)
+                await session.commit()
+                print("Seeded test user: test@example.com")
+    
+    yield
+    # Shutdown (if needed)
+
+app = FastAPI(title="LeaderAI", lifespan=lifespan)
 
 # Mount static files
 static_path = Path(__file__).parent / "static"
