@@ -1,4 +1,7 @@
-.PHONY: test lint run build backup list stop restart
+.PHONY: test lint run build backup list stop restart ready
+
+ready: lint test
+
 
 test:
 	cd backend && PYTHONPATH=. pytest

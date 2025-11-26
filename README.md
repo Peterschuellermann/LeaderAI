@@ -80,6 +80,9 @@ cd backend && pytest
 
 # OR using Make (if dependencies are installed)
 make test
+
+# Verify code quality (lint + test) - recommended before pushing
+make ready
 ```
 
 ## 🛠 Configuration
