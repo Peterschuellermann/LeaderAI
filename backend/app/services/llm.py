@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Any
-import asyncio
 import json
 from app.config import settings
 from openai import AsyncOpenAI
@@ -16,8 +15,6 @@ class LLMProvider(ABC):
 
 class MockLLMProvider(LLMProvider):
     async def generate_goals(self, employee_context: str, project_context: str, potential: Optional[str] = None, criteria: Optional[str] = None) -> Dict[str, Any]:
-        await asyncio.sleep(2) # Simulate delay
-        
         if potential == "P3":
              return {
                  "title": "Morale Maintenance",
@@ -46,7 +43,6 @@ class MockLLMProvider(LLMProvider):
         }
 
     async def analyze_skill_gap(self, team_skills: List[str], project_requirements: str) -> str:
-        await asyncio.sleep(2)
         return f"""
         Team skills: {', '.join(team_skills)}
         Project needs: {project_requirements}
