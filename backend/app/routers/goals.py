@@ -87,6 +87,7 @@ async def generate_suggestions(
     request: Request,
     background_tasks: BackgroundTasks,
     employee_id: int = Form(...),
+    title: Optional[str] = Form(None),
     project_id: Optional[int] = Form(None),
     db: AsyncSession = Depends(get_db),
     user: str = Depends(get_current_user)
@@ -106,6 +107,10 @@ async def generate_suggestions(
         project = proj_result.scalar_one_or_none()
         if project:
             proj_context = f"Project: {project.name}, Description: {project.description}"
+
+    # If title is provided, add it to the context or pass it explicitly
+    if title:
+        proj_context += f". Proposed Title: {title}"
 
     task_id = str(uuid.uuid4())
     tasks[task_id] = {"status": "pending", "employee_id": employee_id}

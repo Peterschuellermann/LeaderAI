@@ -57,10 +57,10 @@ async def test_ai_goal_suggestion_flow(db_session, override_get_db):
     # Create employee
     client.post("/employees/", data={"name": "AI User", "role": "Dev", "email": "ai@test.com"})
     
-    # 1. Request Suggestion
+    # 1. Request Suggestion with Title
     response = client.post(
         "/goals/generate_suggestions",
-        data={"employee_id": 1},
+        data={"employee_id": 1, "title": "Learn Golang"},
         headers={"HX-Request": "true"} # Simulate HTMX
     )
     assert response.status_code == 200
@@ -82,14 +82,14 @@ async def test_ai_goal_suggestion_flow(db_session, override_get_db):
     response = client.get(f"/goals/task/{task_id}")
     assert response.status_code == 200
     
-    # Ideally we want to see the result form.
-    # Depending on timing, it might be "AI is thinking" or the form.
-    # But usually TestClient waits for background tasks? No, Starlette TestClient runs background tasks AFTER response.
-    # So the first poll might be too fast if the background task sleeps.
-    # But wait, `asyncio.sleep` in background task...
-    
-    # Let's just check that we get a valid response.
+    # Check for form fill response (OOB swaps)
+    # The response should eventually contain hx-swap-oob tags or at least valid HTML
     assert "task_poll" in response.template.name or "suggestion_result" in response.template.name
+    
+    if "suggestion_result" in response.template.name:
+         # Verify we got the OOB swaps if the task finished
+         assert 'hx-swap-oob="true"' in response.text
+         assert 'id="id_description"' in response.text
 
 @pytest.mark.asyncio
 async def test_llm_logic_mock(db_session):
@@ -103,11 +103,13 @@ async def test_llm_logic_mock(db_session):
     res_p3 = await provider.generate_goals("Ctx", "Proj", potential="P3")
     assert isinstance(res_p3, dict)
     assert "Morale" in res_p3["title"] or "morale" in res_p3["objective"]
+    assert "Rationale: P3" in res_p3["objective"]
     
     # P4 Case
     res_p4 = await provider.generate_goals("Ctx", "Proj", potential="P4")
     assert isinstance(res_p4, dict)
     assert "Termination" in res_p4["title"] or "Terminate" in res_p4["objective"]
+    assert "Rationale: P4" in res_p4["objective"]
     
     # P1 Case
     res_p1 = await provider.generate_goals("Ctx", "Proj", potential="P1")

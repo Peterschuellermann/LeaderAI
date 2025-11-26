@@ -21,7 +21,7 @@ class MockLLMProvider(LLMProvider):
         if potential == "P3":
              return {
                  "title": "Morale Maintenance",
-                 "objective": "Just don't kill morale.",
+                 "objective": "Just don't kill morale. (Rationale: P3 Rating - Maintenance)",
                  "due_date": "Ongoing",
                  "success_metrics": "Team happiness stable.",
                  "manager_support": "Regular high-fives."
@@ -30,12 +30,15 @@ class MockLLMProvider(LLMProvider):
         if potential == "P4":
              return {
                  "title": "Termination Process",
-                 "objective": "Terminate employment.",
+                 "objective": "Terminate employment. (Rationale: P4 Rating - Performance)",
                  "due_date": "Immediate",
                  "success_metrics": "Employment terminated.",
                  "manager_support": "HR involvement."
              }
 
+        # For generic requests, we can simulate using the title if it was passed in the context string
+        # But for Mock, we'll keep it simple or try to extract it if needed for realism.
+        # For now, static response is fine, or we can dynamicize it slightly.
         return {
             "title": "Improve Python Proficiency",
             "objective": f"Enhance skills in Python based on {project_context}. Focus on async patterns.",
@@ -67,7 +70,7 @@ class OpenAIProvider(LLMProvider):
         if potential == "P3":
             return {
                  "title": "Morale Maintenance",
-                 "objective": "Just don't kill morale.",
+                 "objective": "Just don't kill morale. (Rationale: P3 Rating - Maintenance)",
                  "due_date": "Ongoing",
                  "success_metrics": "Team happiness stable.",
                  "manager_support": "Regular high-fives."
@@ -75,7 +78,7 @@ class OpenAIProvider(LLMProvider):
         if potential == "P4":
             return {
                  "title": "Termination Process",
-                 "objective": "Terminate employment.",
+                 "objective": "Terminate employment. (Rationale: P4 Rating - Performance)",
                  "due_date": "Immediate",
                  "success_metrics": "Employment terminated.",
                  "manager_support": "HR involvement."
