@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import List
 import asyncio
 from app.config import settings
 from openai import AsyncOpenAI

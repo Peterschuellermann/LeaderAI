@@ -1,10 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request, Form
+from fastapi import APIRouter, HTTPException, status, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.security import OAuth2PasswordBearer
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
 from app.config import settings
-from typing import Optional
 
 router = APIRouter()
 templates = Jinja2Templates(directory=Path(__file__).parent / "templates")

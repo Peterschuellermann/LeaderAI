@@ -5,7 +5,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
 from sqlalchemy.orm import selectinload
 from pathlib import Path
-from typing import List, Optional
 
 from app.database import get_db
 from app.models import Project, Employee, ProjectAssignment

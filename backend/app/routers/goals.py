@@ -1,16 +1,16 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request, Form, BackgroundTasks
+from fastapi import APIRouter, Depends, status, Request, Form, BackgroundTasks
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from pathlib import Path
-from typing import List, Optional, Dict
+from typing import Optional, Dict
 import uuid
 
 from app.database import get_db
 from app.models import Goal, Employee, Project
 from app.auth import get_current_user
-from app.services.llm import get_llm_service, LLMProvider
+from app.services.llm import get_llm_service
 
 router = APIRouter(prefix="/goals", tags=["goals"])
 templates = Jinja2Templates(directory=Path(__file__).parent.parent / "templates")

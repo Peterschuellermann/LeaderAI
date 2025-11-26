@@ -4,12 +4,10 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, delete
 from pathlib import Path
-from typing import List, Optional
 
 from app.database import get_db
 from app.models import Employee
 from app.auth import get_current_user
-from app.schemas import EmployeeCreate
 
 router = APIRouter(prefix="/employees", tags=["employees"])
 templates = Jinja2Templates(directory=Path(__file__).parent.parent / "templates")

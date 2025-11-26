@@ -2,7 +2,6 @@ import pytest
 from fastapi.testclient import TestClient
 from app.main import app
 from app.config import settings
-from app.services.llm import MockLLMProvider, get_llm_service
 
 client = TestClient(app)
 
