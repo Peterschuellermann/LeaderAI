@@ -10,12 +10,16 @@ from contextlib import asynccontextmanager
 from app.auth import router as auth_router, get_current_user
 from app.routers import employees, projects, goals
 from app.config import settings
-from app.database import SessionLocal
+from app.database import SessionLocal, engine, Base
 from app.models import Employee
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
+    # Create tables if they don't exist
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
     if settings.ENVIRONMENT != "production":
         async with SessionLocal() as session:
             result = await session.execute(select(Employee).filter_by(email="test@example.com"))
