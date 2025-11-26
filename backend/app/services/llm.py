@@ -18,13 +18,22 @@ class MockLLMProvider(LLMProvider):
     async def generate_goals(self, employee_context: str, project_context: str, potential: str = None, criteria: str = None) -> Dict[str, Any]:
         await asyncio.sleep(2) # Simulate delay
         
-        if potential in ["P3", "P4"]:
+        if potential == "P3":
              return {
                  "title": "Maintenance Mode",
                  "objective": f"Employee is rated {potential}. Focus on maintaining current performance standards.",
                  "due_date": "Ongoing",
                  "success_metrics": "Maintain current KPI levels.",
                  "manager_support": "Regular check-ins."
+             }
+
+        if potential == "P4":
+             return {
+                 "title": "Performance Improvement",
+                 "objective": f"Employee is rated {potential}. Focus on addressing performance gaps.",
+                 "due_date": "Immediate",
+                 "success_metrics": "Meet PIP requirements.",
+                 "manager_support": "Weekly coaching."
              }
 
         return {
