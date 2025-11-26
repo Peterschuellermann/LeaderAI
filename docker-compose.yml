@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  web:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    environment:
+      - DATABASE_URL=sqlite+aiosqlite:///./leaderai.db
+      - SECRET_KEY=dev_secret_key_change_in_prod
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  # db:  # keeping commented out until we switch to postgres, using sqlite for now as per MVP plan
+  #   image: postgres:15
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   environment:
+  #     - POSTGRES_USER=leaderai
+  #     - POSTGRES_PASSWORD=leaderai
+  #     - POSTGRES_DB=leaderai
+
+volumes:
+  postgres_data:
+
