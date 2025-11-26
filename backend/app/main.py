@@ -68,11 +68,13 @@ async def auth_middleware(request: Request, call_next):
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request, user: str = Depends(get_current_user)):
-    return templates.TemplateResponse("index.html", {"request": request, "title": "LeaderAI", "user": user})
+    return templates.TemplateResponse(
+        request=request, name="index.html", context={"title": "LeaderAI", "user": user}
+    )
 
 @app.get("/feedback", response_class=HTMLResponse)
 async def feedback_form(request: Request, user: str = Depends(get_current_user)):
-    return templates.TemplateResponse("feedback.html", {"request": request, "user": user})
+    return templates.TemplateResponse(request=request, name="feedback.html", context={"user": user})
 
 @app.post("/feedback", response_class=HTMLResponse)
 async def submit_feedback(
@@ -84,8 +86,11 @@ async def submit_feedback(
     async with aiofiles.open("feedback.log", mode="a") as f:
         await f.write(f"User: {user} | Feedback: {feedback}\n")
     
-    return templates.TemplateResponse("feedback.html", {
-        "request": request, 
-        "user": user,
-        "message": "Thank you for your feedback!"
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="feedback.html",
+        context={
+            "user": user,
+            "message": "Thank you for your feedback!",
+        },
+    )

@@ -21,18 +21,21 @@ async def list_projects(
 ):
     result = await db.execute(select(Project).order_by(Project.name))
     projects = result.scalars().all()
-    return templates.TemplateResponse("projects/list.html", {
-        "request": request, 
-        "projects": projects,
-        "user": user
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="projects/list.html",
+        context={
+            "projects": projects,
+            "user": user
+        }
+    )
 
 @router.get("/new", response_class=HTMLResponse)
 async def new_project_form(
     request: Request, 
     user: str = Depends(get_current_user)
 ):
-    return templates.TemplateResponse("projects/form.html", {"request": request, "user": user})
+    return templates.TemplateResponse(request=request, name="projects/form.html", context={"user": user})
 
 @router.post("/", response_class=HTMLResponse)
 async def create_project(
@@ -79,12 +82,15 @@ async def project_detail(
     emp_result = await db.execute(select(Employee))
     all_employees = emp_result.scalars().all()
 
-    return templates.TemplateResponse("projects/detail.html", {
-        "request": request, 
-        "project": project,
-        "all_employees": all_employees,
-        "user": user
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="projects/detail.html",
+        context={
+            "project": project,
+            "all_employees": all_employees,
+            "user": user
+        }
+    )
 
 @router.post("/{project_id}/assign")
 async def assign_employee(

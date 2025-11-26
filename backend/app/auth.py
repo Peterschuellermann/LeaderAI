@@ -9,7 +9,7 @@ templates = Jinja2Templates(directory=Path(__file__).parent / "templates")
 
 @router.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="login.html")
 
 @router.post("/login")
 async def login(request: Request, username: str = Form(...), password: str = Form(...)):
@@ -18,7 +18,7 @@ async def login(request: Request, username: str = Form(...), password: str = For
         response.set_cookie(key="session_user", value=username, httponly=True, secure=False) # Secure=False for dev
         return response
     
-    return templates.TemplateResponse("login.html", {"request": request, "error": "Invalid credentials"})
+    return templates.TemplateResponse(request=request, name="login.html", context={"error": "Invalid credentials"})
 
 @router.get("/logout")
 async def logout(request: Request):

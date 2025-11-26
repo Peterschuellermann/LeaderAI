@@ -20,18 +20,21 @@ async def list_employees(
 ):
     result = await db.execute(select(Employee).order_by(Employee.name))
     employees = result.scalars().all()
-    return templates.TemplateResponse("employees/list.html", {
-        "request": request, 
-        "employees": employees,
-        "user": user
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="employees/list.html",
+        context={
+            "employees": employees,
+            "user": user
+        }
+    )
 
 @router.get("/new", response_class=HTMLResponse)
 async def new_employee_form(
     request: Request, 
     user: str = Depends(get_current_user)
 ):
-    return templates.TemplateResponse("employees/form.html", {"request": request, "user": user})
+    return templates.TemplateResponse(request=request, name="employees/form.html", context={"user": user})
 
 @router.post("/", response_class=HTMLResponse)
 async def create_employee(
@@ -63,11 +66,14 @@ async def create_employee(
         return RedirectResponse(url="/employees", status_code=status.HTTP_303_SEE_OTHER)
     except Exception as e:
         # Ideally handle duplicate email error specifically
-        return templates.TemplateResponse("employees/form.html", {
-            "request": request, 
-            "error": f"Error creating employee: {str(e)}",
-            "user": user
-        })
+        return templates.TemplateResponse(
+            request=request,
+            name="employees/form.html",
+            context={
+                "error": f"Error creating employee: {str(e)}",
+                "user": user
+            }
+        )
 
 @router.get("/{employee_id}", response_class=HTMLResponse)
 async def employee_detail(
@@ -82,11 +88,14 @@ async def employee_detail(
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
         
-    return templates.TemplateResponse("employees/detail.html", {
-        "request": request, 
-        "employee": employee,
-        "user": user
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="employees/detail.html",
+        context={
+            "employee": employee,
+            "user": user
+        }
+    )
 
 @router.post("/{employee_id}/delete")
 async def delete_employee(

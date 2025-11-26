@@ -30,12 +30,15 @@ async def list_goals(
     emp_result = await db.execute(select(Employee))
     employees = emp_result.scalars().all()
 
-    return templates.TemplateResponse("goals/list.html", {
-        "request": request, 
-        "goals": goals,
-        "employees": employees,
-        "user": user
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="goals/list.html",
+        context={
+            "goals": goals,
+            "employees": employees,
+            "user": user
+        }
+    )
 
 @router.post("/", response_class=HTMLResponse)
 async def create_goal(
@@ -100,10 +103,13 @@ async def generate_suggestions(
     
     background_tasks.add_task(process_ai_request, task_id, emp_context, proj_context)
     
-    return templates.TemplateResponse("goals/task_poll.html", {
-        "request": request, 
-        "task_id": task_id
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="goals/task_poll.html",
+        context={
+            "task_id": task_id
+        }
+    )
 
 @router.get("/task/{task_id}", response_class=HTMLResponse)
 async def get_task_status(request: Request, task_id: str):
@@ -112,14 +118,20 @@ async def get_task_status(request: Request, task_id: str):
         return "Task not found"
     
     if task["status"] == "pending":
-        return templates.TemplateResponse("goals/task_poll.html", {
-            "request": request, 
-            "task_id": task_id
-        })
+        return templates.TemplateResponse(
+            request=request,
+            name="goals/task_poll.html",
+            context={
+                "task_id": task_id
+            }
+        )
     
     # Completed
-    return templates.TemplateResponse("goals/suggestion_result.html", {
-        "request": request, 
-        "result": task["result"]
-    })
+    return templates.TemplateResponse(
+        request=request,
+        name="goals/suggestion_result.html",
+        context={
+            "result": task["result"]
+        }
+    )
 
