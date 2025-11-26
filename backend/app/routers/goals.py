@@ -22,6 +22,7 @@ tasks: Dict[str, dict] = {}
 @router.get("/", response_class=HTMLResponse)
 async def list_goals(
     request: Request,
+    employee_id: Optional[int] = None,
     db: AsyncSession = Depends(get_db),
     user: str = Depends(get_current_user)
 ):
@@ -37,7 +38,8 @@ async def list_goals(
         context={
             "goals": goals,
             "employees": employees,
-            "user": user
+            "user": user,
+            "selected_employee_id": employee_id
         }
     )
 

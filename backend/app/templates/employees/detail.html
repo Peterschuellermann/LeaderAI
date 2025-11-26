@@ -93,6 +93,11 @@
             <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                 <dt class="text-sm font-medium text-gray-500">Goals</dt>
                 <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    <div class="mb-4">
+                        <a href="/goals?employee_id={{ employee.id }}" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            Set New Goal
+                        </a>
+                    </div>
                     {% if employee.goals %}
                     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         {% for goal in employee.goals %}

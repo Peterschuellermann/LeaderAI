@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.config import settings
 from unittest.mock import patch
-from app.services.llm import get_llm_service, MockLLMProvider
+from app.services.llm import MockLLMProvider
 
 client = TestClient(app)
 

@@ -14,7 +14,7 @@
                 <label class="block text-sm font-medium text-gray-700">Employee</label>
                 <select id="id_employee_id" name="employee_id" class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
                     {% for emp in employees %}
-                    <option value="{{ emp.id }}">{{ emp.name }}</option>
+                    <option value="{{ emp.id }}" {% if selected_employee_id and emp.id == selected_employee_id %}selected{% endif %}>{{ emp.name }}</option>
                     {% endfor %}
                 </select>
             </div>
