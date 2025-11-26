@@ -24,7 +24,7 @@ async def test_create_employee(db_session):
 @pytest.mark.asyncio
 async def test_project_assignment_relationship(db_session):
     # Create Employee
-    emp = Employee(name="Alice", email="alice@test.com")
+    emp = Employee(name="Alice", email="alice@test.com", role="Developer")
     db_session.add(emp)
     
     # Create Project
@@ -53,7 +53,7 @@ async def test_project_assignment_relationship(db_session):
 
 @pytest.mark.asyncio
 async def test_goal_creation(db_session):
-    emp = Employee(name="Bob", email="bob@test.com")
+    emp = Employee(name="Bob", email="bob@test.com", role="Engineer")
     db_session.add(emp)
     await db_session.commit()
     

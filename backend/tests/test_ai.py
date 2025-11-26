@@ -129,7 +129,7 @@ async def test_openai_key_integration_skipped_by_default():
         pytest.skip("Skipping real OpenAI test. Set RUN_REAL_OPENAI_TEST=1 to run.")
         
     # Manually import to avoid patch
-    from app.services.llm import OpenAIProvider, get_llm_service
+    from app.services.llm import OpenAIProvider
     from app.config import settings
     
     # Temporarily set a dummy key if none exists, just to test instantiation logic

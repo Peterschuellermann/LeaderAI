@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Optional, Dict, Any
+from typing import List, Dict, Any, Optional
 import asyncio
 import json
 from app.config import settings
@@ -7,7 +7,7 @@ from openai import AsyncOpenAI
 
 class LLMProvider(ABC):
     @abstractmethod
-    async def generate_goals(self, employee_context: str, project_context: str, potential: str = None, criteria: str = None) -> Dict[str, Any]:
+    async def generate_goals(self, employee_context: str, project_context: str, potential: Optional[str] = None, criteria: Optional[str] = None) -> Dict[str, Any]:
         pass
 
     @abstractmethod
@@ -15,7 +15,7 @@ class LLMProvider(ABC):
         pass
 
 class MockLLMProvider(LLMProvider):
-    async def generate_goals(self, employee_context: str, project_context: str, potential: str = None, criteria: str = None) -> Dict[str, Any]:
+    async def generate_goals(self, employee_context: str, project_context: str, potential: Optional[str] = None, criteria: Optional[str] = None) -> Dict[str, Any]:
         await asyncio.sleep(2) # Simulate delay
         
         if potential == "P3":
@@ -62,7 +62,7 @@ class OpenAIProvider(LLMProvider):
     def __init__(self):
         self.client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY if hasattr(settings, 'OPENAI_API_KEY') else "dummy")
 
-    async def generate_goals(self, employee_context: str, project_context: str, potential: str = None, criteria: str = None) -> Dict[str, Any]:
+    async def generate_goals(self, employee_context: str, project_context: str, potential: Optional[str] = None, criteria: Optional[str] = None) -> Dict[str, Any]:
         if not hasattr(settings, 'OPENAI_API_KEY') or not settings.OPENAI_API_KEY:
              return {"error": "OpenAI API Key not configured."}
         

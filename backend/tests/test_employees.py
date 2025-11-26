@@ -1,7 +1,9 @@
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 from app.main import app
 from app.config import settings
+from app.models import Employee, Project
 
 client = TestClient(app)
 
@@ -79,8 +81,11 @@ async def test_delete_employee(db_session, override_get_db):
         }
     )
     
-    # Assuming ID 1 for the first one in this session
-    response = client.post("/employees/1/delete", follow_redirects=False)
+    # Get ID
+    result = await db_session.execute(select(Employee).filter_by(email="delete@test.com"))
+    emp = result.scalar_one()
+    
+    response = client.post(f"/employees/{emp.id}/delete", follow_redirects=False)
     assert response.status_code == 303
     
     response = client.get("/employees/")
@@ -110,15 +115,18 @@ async def test_employee_integration(db_session, override_get_db):
         }
     )
     
-    # 3. Assign Employee (ID 1) to Project (ID 1)
-    # Note: IDs depend on test execution order if not isolated properly, 
-    # but fixture says 'function' scope and drops all tables, so IDs should restart or at least be predictable if we create them now.
-    # We can query DB to be sure, but let's try assuming 1 first.
+    # Get IDs
+    emp_result = await db_session.execute(select(Employee).filter_by(email="int@test.com"))
+    emp = emp_result.scalar_one()
     
+    proj_result = await db_session.execute(select(Project).filter_by(name="Integration Project"))
+    proj = proj_result.scalar_one()
+
+    # 3. Assign Employee
     client.post(
-        "/projects/1/assign",
+        f"/projects/{proj.id}/assign",
         data={
-            "employee_id": 1,
+            "employee_id": emp.id,
             "role": "Lead",
             "capacity": 50
         }
@@ -130,7 +138,7 @@ async def test_employee_integration(db_session, override_get_db):
         data={
             "title": "Integration Goal",
             "description": "Test Goal Description",
-            "employee_id": 1
+            "employee_id": emp.id
         }
     )
     
@@ -142,7 +150,7 @@ async def test_employee_integration(db_session, override_get_db):
     assert "Lead" in response.text
     
     # 6. Check Detail Page
-    response = client.get("/employees/1")
+    response = client.get(f"/employees/{emp.id}")
     assert response.status_code == 200
     assert "Integration User" in response.text
     assert "Integration Project" in response.text

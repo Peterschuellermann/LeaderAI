@@ -74,7 +74,7 @@ async def run_goal_generation_task(task_id: str, employee_id: int, project_id: i
     # For simplicity in MVP, I'll gather data in the endpoint and pass strings to this task.
     pass
 
-async def process_ai_request(task_id: str, employee_context: str, project_context: str, potential: str = None):
+async def process_ai_request(task_id: str, employee_context: str, project_context: str, potential: Optional[str] = None):
     llm = get_llm_service()
     result = await llm.generate_goals(employee_context, project_context, potential)
     # Update task with result
