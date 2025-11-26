@@ -47,8 +47,57 @@
                 <dt class="text-sm font-medium text-gray-500">Development Plan</dt>
                 <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 whitespace-pre-wrap">{{ employee.development_plan }}</dd>
             </div>
+            <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Project Assignments</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    {% if employee.assignments %}
+                    <ul class="border border-gray-200 rounded-md divide-y divide-gray-200">
+                        {% for assignment in employee.assignments %}
+                        <li class="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
+                            <div class="w-0 flex-1 flex items-center">
+                                <span class="ml-2 flex-1 w-0 truncate">
+                                    <a href="/projects/{{ assignment.project.id }}" class="font-medium text-blue-600 hover:underline">{{ assignment.project.name }}</a>
+                                    <span class="text-gray-500"> - {{ assignment.role }} ({{ assignment.capacity }}%)</span>
+                                </span>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <span class="text-gray-500">No active project assignments.</span>
+                    {% endif %}
+                </dd>
+            </div>
+            <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Goals</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    {% if employee.goals %}
+                    <ul class="border border-gray-200 rounded-md divide-y divide-gray-200">
+                        {% for goal in employee.goals %}
+                        <li class="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
+                            <div class="w-0 flex-1 flex items-center">
+                                <span class="ml-2 flex-1 w-0 truncate">
+                                    <span class="font-medium">{{ goal.title }}</span>
+                                    <p class="text-gray-500 mt-1">{{ goal.description }}</p>
+                                </span>
+                            </div>
+                            <div class="ml-4 flex-shrink-0">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    {% if goal.status == 'Achieved' %}bg-green-100 text-green-800
+                                    {% elif goal.status == 'In Progress' %}bg-yellow-100 text-yellow-800
+                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                    {{ goal.status }}
+                                </span>
+                            </div>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <span class="text-gray-500">No goals set.</span>
+                    {% endif %}
+                </dd>
+            </div>
         </dl>
     </div>
 </div>
 {% endblock %}
-

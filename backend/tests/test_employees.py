@@ -86,3 +86,65 @@ async def test_delete_employee(db_session, override_get_db):
     response = client.get("/employees/")
     assert "To Delete" not in response.text
 
+@pytest.mark.asyncio
+async def test_employee_integration(db_session, override_get_db):
+    """Test that assignments and goals appear on employee pages."""
+    login(client)
+    
+    # 1. Create Employee
+    client.post(
+        "/employees/",
+        data={
+            "name": "Integration User",
+            "role": "Integrator",
+            "email": "int@test.com",
+        }
+    )
+    
+    # 2. Create Project
+    client.post(
+        "/projects/",
+        data={
+            "name": "Integration Project",
+            "status": "Active",
+        }
+    )
+    
+    # 3. Assign Employee (ID 1) to Project (ID 1)
+    # Note: IDs depend on test execution order if not isolated properly, 
+    # but fixture says 'function' scope and drops all tables, so IDs should restart or at least be predictable if we create them now.
+    # We can query DB to be sure, but let's try assuming 1 first.
+    
+    client.post(
+        "/projects/1/assign",
+        data={
+            "employee_id": 1,
+            "role": "Lead",
+            "capacity": 50
+        }
+    )
+    
+    # 4. Create Goal
+    client.post(
+        "/goals/",
+        data={
+            "title": "Integration Goal",
+            "description": "Test Goal Description",
+            "employee_id": 1
+        }
+    )
+    
+    # 5. Check List Page
+    response = client.get("/employees/")
+    assert response.status_code == 200
+    assert "Integration User" in response.text
+    assert "Integration Project" in response.text
+    assert "Lead" in response.text
+    
+    # 6. Check Detail Page
+    response = client.get("/employees/1")
+    assert response.status_code == 200
+    assert "Integration User" in response.text
+    assert "Integration Project" in response.text
+    assert "Integration Goal" in response.text
+    assert "Test Goal Description" in response.text
