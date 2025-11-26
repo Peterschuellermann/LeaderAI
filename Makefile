@@ -1,4 +1,4 @@
-.PHONY: test lint run build backup
+.PHONY: test lint run build backup list stop restart
 
 test:
 	cd backend && PYTHONPATH=. pytest
@@ -14,3 +14,11 @@ build:
 
 backup:
 	./scripts/backup.sh
+
+list:
+	./scripts/list_servers.sh
+
+stop:
+	./scripts/stop_server.sh
+
+restart: stop run

@@ -48,6 +48,21 @@ If you want to develop locally without Docker:
     uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
     ```
 
+4.  **Manage Server Processes**:
+    
+    If you encounter "address already in use" errors, use the following commands to manage running servers:
+
+    ```bash
+    # List all running LeaderAI server processes
+    make list
+
+    # Stop all running LeaderAI server processes (ports 8000-8005)
+    make stop
+
+    # Restart the application (stop + run)
+    make restart
+    ```
+
 ## 📚 Documentation
 
 *   [Features](docs/FEATURES.md)
