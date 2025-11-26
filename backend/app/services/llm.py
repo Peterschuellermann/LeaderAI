@@ -20,20 +20,20 @@ class MockLLMProvider(LLMProvider):
         
         if potential == "P3":
              return {
-                 "title": "Maintenance Mode",
-                 "objective": f"Employee is rated {potential}. Focus on maintaining current performance standards.",
+                 "title": "Morale Maintenance",
+                 "objective": "Just don't kill morale.",
                  "due_date": "Ongoing",
-                 "success_metrics": "Maintain current KPI levels.",
-                 "manager_support": "Regular check-ins."
+                 "success_metrics": "Team happiness stable.",
+                 "manager_support": "Regular high-fives."
              }
 
         if potential == "P4":
              return {
-                 "title": "Performance Improvement",
-                 "objective": f"Employee is rated {potential}. Focus on addressing performance gaps.",
+                 "title": "Termination Process",
+                 "objective": "Terminate employment.",
                  "due_date": "Immediate",
-                 "success_metrics": "Meet PIP requirements.",
-                 "manager_support": "Weekly coaching."
+                 "success_metrics": "Employment terminated.",
+                 "manager_support": "HR involvement."
              }
 
         return {
@@ -66,19 +66,19 @@ class OpenAIProvider(LLMProvider):
         # Potential Logic
         if potential == "P3":
             return {
-                 "title": "Maintenance",
-                 "objective": "Employee is rated P3 (Good at job, no desire for more). Maintain current high standards.",
+                 "title": "Morale Maintenance",
+                 "objective": "Just don't kill morale.",
                  "due_date": "Ongoing",
-                 "success_metrics": "Consistent delivery.",
-                 "manager_support": "Quarterly reviews."
+                 "success_metrics": "Team happiness stable.",
+                 "manager_support": "Regular high-fives."
              }
         if potential == "P4":
             return {
-                 "title": "Performance Improvement",
-                 "objective": "Employee is rated P4 (Underperformance). Address performance gaps.",
+                 "title": "Termination Process",
+                 "objective": "Terminate employment.",
                  "due_date": "Immediate",
-                 "success_metrics": "Meet PIP requirements.",
-                 "manager_support": "Weekly coaching."
+                 "success_metrics": "Employment terminated.",
+                 "manager_support": "HR involvement."
              }
             
         system_prompt = "You are a helpful engineering manager assistant. Output ONLY valid JSON."

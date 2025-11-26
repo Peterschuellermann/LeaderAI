@@ -102,12 +102,12 @@ async def test_llm_logic_mock(db_session):
     # P3 Case
     res_p3 = await provider.generate_goals("Ctx", "Proj", potential="P3")
     assert isinstance(res_p3, dict)
-    assert "Maintenance" in res_p3["title"] or "Maintenance" in res_p3["objective"]
+    assert "Morale" in res_p3["title"] or "morale" in res_p3["objective"]
     
     # P4 Case
     res_p4 = await provider.generate_goals("Ctx", "Proj", potential="P4")
     assert isinstance(res_p4, dict)
-    assert "Performance" in res_p4["title"] or "Improvement" in res_p4["title"]
+    assert "Termination" in res_p4["title"] or "Terminate" in res_p4["objective"]
     
     # P1 Case
     res_p1 = await provider.generate_goals("Ctx", "Proj", potential="P1")
