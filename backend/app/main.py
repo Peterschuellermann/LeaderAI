@@ -22,20 +22,52 @@ async def lifespan(app: FastAPI):
 
     if settings.ENVIRONMENT != "production":
         async with SessionLocal() as session:
-            result = await session.execute(select(Employee).filter_by(email="test@example.com"))
+            # Check if seeded data exists (check for one of them)
+            result = await session.execute(select(Employee).filter_by(email="p1@example.com"))
             existing_user = result.scalar_one_or_none()
             
             if not existing_user:
-                test_user = Employee(
-                    name="Test User",
-                    role="Tester",
-                    email="test@example.com",
-                    skills=["Manual Testing", "Bug Hunting"],
-                    notes="Created automatically for development/testing."
-                )
-                session.add(test_user)
+                employees_to_seed = [
+                    Employee(
+                        name="Alice Strategy",
+                        role="Senior Architect",
+                        email="p1@example.com",
+                        skills=["System Design", "Leadership", "Cloud Architecture"],
+                        notes="High performer, very ambitious.",
+                        potential="P1",
+                        development_plan="Prepare for CTO role."
+                    ),
+                    Employee(
+                        name="Bob Learner",
+                        role="Junior Dev",
+                        email="p2@example.com",
+                        skills=["Python", "Basic SQL"],
+                        notes="Eager to learn but lacks experience.",
+                        potential="P2",
+                        development_plan="Complete advanced Python course."
+                    ),
+                    Employee(
+                        name="Charlie Steady",
+                        role="Senior Dev",
+                        email="p3@example.com",
+                        skills=["Java", "Spring Boot", "Legacy Systems"],
+                        notes="Reliable, does the job well, no desire for promotion.",
+                        potential="P3",
+                        development_plan="Maintain current performance."
+                    ),
+                    Employee(
+                        name="David Drift",
+                        role="Support Engineer",
+                        email="p4@example.com",
+                        skills=["Basic Troubleshooting"],
+                        notes="Struggling with tasks, low motivation.",
+                        potential="P4",
+                        development_plan="Performance improvement plan."
+                    )
+                ]
+                session.add_all(employees_to_seed)
                 await session.commit()
-                print("Seeded test user: test@example.com")
+                print("Seeded P1-P4 employees.")
     
     yield
     # Shutdown (if needed)

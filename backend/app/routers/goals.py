@@ -68,9 +68,9 @@ async def run_goal_generation_task(task_id: str, employee_id: int, project_id: i
     # For simplicity in MVP, I'll gather data in the endpoint and pass strings to this task.
     pass
 
-async def process_ai_request(task_id: str, employee_context: str, project_context: str):
+async def process_ai_request(task_id: str, employee_context: str, project_context: str, potential: str = None):
     llm = get_llm_service()
-    result = await llm.generate_goals(employee_context, project_context)
+    result = await llm.generate_goals(employee_context, project_context, potential)
     tasks[task_id] = {"status": "completed", "result": result}
 
 @router.post("/generate_suggestions")
@@ -101,7 +101,7 @@ async def generate_suggestions(
     task_id = str(uuid.uuid4())
     tasks[task_id] = {"status": "pending"}
     
-    background_tasks.add_task(process_ai_request, task_id, emp_context, proj_context)
+    background_tasks.add_task(process_ai_request, task_id, emp_context, proj_context, employee.potential)
     
     return templates.TemplateResponse(
         request=request,

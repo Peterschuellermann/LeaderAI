@@ -13,6 +13,7 @@ class Employee(Base):
     skills = Column(JSON, default=list)  # List of strings
     development_plan = Column(Text, nullable=True)
     notes = Column(Text, nullable=True)
+    potential = Column(String, nullable=True) # P1, P2, P3, P4
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

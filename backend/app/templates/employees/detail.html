@@ -40,8 +40,34 @@
                 </dd>
             </div>
             <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt class="text-sm font-medium text-gray-500">Notes</dt>
-                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 whitespace-pre-wrap">{{ employee.notes }}</dd>
+                <dt class="text-sm font-medium text-gray-500">Performance & Notes</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    <form action="/employees/{{ employee.id }}/notes" method="post">
+                        <div class="mb-4 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+                            <div class="sm:col-span-3">
+                                <label for="potential" class="block text-xs font-medium text-gray-700 uppercase mb-1">Potential</label>
+                                <select id="potential" name="potential" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                    <option value="">Select...</option>
+                                    <option value="P1" {% if employee.potential == 'P1' %}selected{% endif %}>P1 - High Potential</option>
+                                    <option value="P2" {% if employee.potential == 'P2' %}selected{% endif %}>P2 - Needs Skills</option>
+                                    <option value="P3" {% if employee.potential == 'P3' %}selected{% endif %}>P3 - Steady</option>
+                                    <option value="P4" {% if employee.potential == 'P4' %}selected{% endif %}>P4 - Underperformer</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                             <label for="notes" class="block text-xs font-medium text-gray-700 uppercase mb-1">Notes</label>
+                             <textarea id="notes" name="notes" rows="3" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border border-gray-300 rounded-md p-2">{{ employee.notes or '' }}</textarea>
+                        </div>
+                        
+                        <div class="text-right">
+                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Update Notes & Potential
+                            </button>
+                        </div>
+                    </form>
+                </dd>
             </div>
             <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                 <dt class="text-sm font-medium text-gray-500">Development Plan</dt>

@@ -9,6 +9,7 @@ class EmployeeBase(BaseModel):
     skills: List[str] = []
     development_plan: Optional[str] = None
     notes: Optional[str] = None
+    potential: Optional[str] = None
 
 class EmployeeCreate(EmployeeBase):
     pass

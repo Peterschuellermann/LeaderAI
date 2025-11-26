@@ -51,6 +51,7 @@ async def create_employee(
     skills: str = Form(""), # Comma separated
     notes: str = Form(None),
     development_plan: str = Form(None),
+    potential: str = Form(None),
     db: AsyncSession = Depends(get_db),
     user: str = Depends(get_current_user)
 ):
@@ -63,7 +64,8 @@ async def create_employee(
         email=email,
         skills=skill_list,
         notes=notes,
-        development_plan=development_plan
+        development_plan=development_plan,
+        potential=potential
     )
     
     try:
@@ -117,3 +119,24 @@ async def delete_employee(
     await db.execute(delete(Employee).where(Employee.id == employee_id))
     await db.commit()
     return RedirectResponse(url="/employees", status_code=status.HTTP_303_SEE_OTHER)
+
+@router.post("/{employee_id}/notes")
+async def update_employee_notes(
+    request: Request,
+    employee_id: int,
+    notes: str = Form(None),
+    potential: str = Form(None),
+    db: AsyncSession = Depends(get_db),
+    user: str = Depends(get_current_user)
+):
+    result = await db.execute(select(Employee).filter(Employee.id == employee_id))
+    employee = result.scalar_one_or_none()
+    
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+        
+    employee.notes = notes
+    employee.potential = potential
+        
+    await db.commit()
+    return RedirectResponse(url=f"/employees/{employee_id}", status_code=status.HTTP_303_SEE_OTHER)

@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 import asyncio
 from app.config import settings
 from openai import AsyncOpenAI
 
 class LLMProvider(ABC):
     @abstractmethod
-    async def generate_goals(self, employee_context: str, project_context: str) -> str:
+    async def generate_goals(self, employee_context: str, project_context: str, potential: str = None, criteria: str = None) -> str:
         pass
 
     @abstractmethod
@@ -14,10 +14,14 @@ class LLMProvider(ABC):
         pass
 
 class MockLLMProvider(LLMProvider):
-    async def generate_goals(self, employee_context: str, project_context: str) -> str:
+    async def generate_goals(self, employee_context: str, project_context: str, potential: str = None, criteria: str = None) -> str:
         await asyncio.sleep(2) # Simulate delay
+        
+        if potential in ["P3", "P4"]:
+             return f"Based on potential rating {potential}, no goals are recommended at this time."
+
         return f"""
-        Based on {employee_context} and {project_context}, here are suggested goals:
+        Based on {employee_context} and {project_context} (Potential: {potential}), here are suggested goals:
         1. Improve Python type hinting proficiency.
         2. Lead the architecture review for the next sprint.
         3. Mentor junior developers on async patterns.
@@ -38,15 +42,34 @@ class OpenAIProvider(LLMProvider):
     def __init__(self):
         self.client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY if hasattr(settings, 'OPENAI_API_KEY') else "dummy")
 
-    async def generate_goals(self, employee_context: str, project_context: str) -> str:
+    async def generate_goals(self, employee_context: str, project_context: str, potential: str = None, criteria: str = None) -> str:
         if not hasattr(settings, 'OPENAI_API_KEY') or not settings.OPENAI_API_KEY:
              return "OpenAI API Key not configured."
-             
+        
+        # Potential Logic
+        if potential == "P3":
+            return "Employee is rated P3 (Good at job, no desire for more). No new goals recommended."
+        if potential == "P4":
+            return "Employee is rated P4 (Underperformance). No development goals recommended."
+            
+        system_prompt = "You are a helpful engineering manager assistant."
+        user_prompt = f"Context: {employee_context}. Project: {project_context}. "
+        
+        if potential == "P1":
+            user_prompt += "The employee is rated P1 (High Potential). Suggest strategic and long-term development goals that help them achieve major milestones or promotion."
+        elif potential == "P2":
+             user_prompt += "The employee is rated P2 (Potential but needs skills). Suggest training and skill-acquisition goals to help them close the gap and perform their role effectively."
+        
+        if criteria:
+            user_prompt += f" Additional Criteria: {criteria}."
+            
+        user_prompt += " Suggest 3 distinct goals."
+
         response = await self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-5-mini",
             messages=[
-                {"role": "system", "content": "You are a helpful engineering manager assistant."},
-                {"role": "user", "content": f"Suggest 3 professional goals for an employee with this profile: {employee_context}. They are working on projects: {project_context}."}
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
             ]
         )
         return response.choices[0].message.content
@@ -56,7 +79,7 @@ class OpenAIProvider(LLMProvider):
              return "OpenAI API Key not configured."
 
         response = await self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-5-mini",
             messages=[
                 {"role": "system", "content": "You are a helpful engineering manager assistant."},
                 {"role": "user", "content": f"Compare these team skills: {', '.join(team_skills)} against these project requirements: {project_requirements}. Identify gaps."}
@@ -70,4 +93,3 @@ def get_llm_service() -> LLMProvider:
     if hasattr(settings, 'OPENAI_API_KEY') and settings.OPENAI_API_KEY and settings.OPENAI_API_KEY != "dummy":
         return OpenAIProvider()
     return MockLLMProvider()
-
