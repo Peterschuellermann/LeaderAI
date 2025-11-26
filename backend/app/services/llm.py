@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional
+from typing import List, Optional, Dict, Any
 import asyncio
 import json
 from app.config import settings
@@ -23,8 +23,8 @@ class MockLLMProvider(LLMProvider):
                  "title": "Morale Maintenance",
                  "objective": "Just don't kill morale. (Rationale: P3 Rating - Maintenance)",
                  "due_date": "Ongoing",
-                 "success_metrics": "Team happiness stable.",
-                 "manager_support": "Regular high-fives."
+                 "success_metrics": "- Maintain current KPI levels.\n- Keep team satisfaction above 4.0.",
+                 "manager_support": "- Regular high-fives.\n- Quarterly lunch."
              }
 
         if potential == "P4":
@@ -32,19 +32,17 @@ class MockLLMProvider(LLMProvider):
                  "title": "Termination Process",
                  "objective": "Terminate employment. (Rationale: P4 Rating - Performance)",
                  "due_date": "Immediate",
-                 "success_metrics": "Employment terminated.",
-                 "manager_support": "HR involvement."
+                 "success_metrics": "- Employment terminated.\n- Handover completed.",
+                 "manager_support": "- HR involvement.\n- Documentation support."
              }
 
-        # For generic requests, we can simulate using the title if it was passed in the context string
-        # But for Mock, we'll keep it simple or try to extract it if needed for realism.
-        # For now, static response is fine, or we can dynamicize it slightly.
+        # For generic requests
         return {
             "title": "Improve Python Proficiency",
             "objective": f"Enhance skills in Python based on {project_context}. Focus on async patterns.",
             "due_date": "Q1 2025",
-            "success_metrics": "1. Complete advanced Python course.\n2. Refactor 3 legacy modules.",
-            "manager_support": "Code reviews and pair programming sessions."
+            "success_metrics": "- Complete advanced Python course.\n- Refactor 3 legacy modules.",
+            "manager_support": "- Code reviews.\n- Pair programming sessions."
         }
 
     async def analyze_skill_gap(self, team_skills: List[str], project_requirements: str) -> str:
@@ -72,16 +70,16 @@ class OpenAIProvider(LLMProvider):
                  "title": "Morale Maintenance",
                  "objective": "Just don't kill morale. (Rationale: P3 Rating - Maintenance)",
                  "due_date": "Ongoing",
-                 "success_metrics": "Team happiness stable.",
-                 "manager_support": "Regular high-fives."
+                 "success_metrics": "- Consistent delivery.\n- No major incidents.",
+                 "manager_support": "- Quarterly reviews."
              }
         if potential == "P4":
             return {
                  "title": "Termination Process",
                  "objective": "Terminate employment. (Rationale: P4 Rating - Performance)",
                  "due_date": "Immediate",
-                 "success_metrics": "Employment terminated.",
-                 "manager_support": "HR involvement."
+                 "success_metrics": "- Meet PIP requirements.\n- Zero incidents.",
+                 "manager_support": "- Weekly coaching."
              }
             
         system_prompt = "You are a helpful engineering manager assistant. Output ONLY valid JSON."
@@ -103,6 +101,8 @@ class OpenAIProvider(LLMProvider):
         - due_date
         - success_metrics
         - manager_support
+        
+        IMPORTANT: Return 'success_metrics' and 'manager_support' as markdown lists (e.g., using '- ' for bullets).
         """
 
         try:

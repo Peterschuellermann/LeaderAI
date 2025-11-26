@@ -104,12 +104,14 @@ async def test_llm_logic_mock(db_session):
     assert isinstance(res_p3, dict)
     assert "Morale" in res_p3["title"] or "morale" in res_p3["objective"]
     assert "Rationale: P3" in res_p3["objective"]
+    assert "-" in res_p3["success_metrics"] # Check for bullet points
     
     # P4 Case
     res_p4 = await provider.generate_goals("Ctx", "Proj", potential="P4")
     assert isinstance(res_p4, dict)
     assert "Termination" in res_p4["title"] or "Terminate" in res_p4["objective"]
     assert "Rationale: P4" in res_p4["objective"]
+    assert "-" in res_p4["success_metrics"] # Check for bullet points
     
     # P1 Case
     res_p1 = await provider.generate_goals("Ctx", "Proj", potential="P1")
@@ -117,6 +119,7 @@ async def test_llm_logic_mock(db_session):
     assert "title" in res_p1
     assert "objective" in res_p1
     assert "due_date" in res_p1
+    assert "-" in res_p1["success_metrics"] # Check for bullet points
 
 @pytest.mark.asyncio
 async def test_openai_key_integration_skipped_by_default():
@@ -129,7 +132,7 @@ async def test_openai_key_integration_skipped_by_default():
         pytest.skip("Skipping real OpenAI test. Set RUN_REAL_OPENAI_TEST=1 to run.")
         
     # Manually import to avoid patch
-    from app.services.llm import OpenAIProvider
+    from app.services.llm import OpenAIProvider, get_llm_service
     from app.config import settings
     
     # Temporarily set a dummy key if none exists, just to test instantiation logic
