@@ -58,12 +58,17 @@ async def create_employee(
     # Parse skills
     skill_list = [s.strip() for s in skills.split(",") if s.strip()]
     
+    # Parse initial note
+    notes_list = []
+    if notes and notes.strip():
+        notes_list.append(notes.strip())
+    
     new_employee = Employee(
         name=name,
         role=role,
         email=email,
         skills=skill_list,
-        notes=notes,
+        notes=notes_list,
         development_plan=development_plan,
         potential=potential
     )
@@ -110,22 +115,10 @@ async def employee_detail(
         }
     )
 
-@router.post("/{employee_id}/delete")
-async def delete_employee(
-    employee_id: int,
-    db: AsyncSession = Depends(get_db),
-    user: str = Depends(get_current_user)
-):
-    await db.execute(delete(Employee).where(Employee.id == employee_id))
-    await db.commit()
-    return RedirectResponse(url="/employees", status_code=status.HTTP_303_SEE_OTHER)
-
-@router.post("/{employee_id}/notes")
-async def update_employee_notes(
+@router.get("/{employee_id}/edit", response_class=HTMLResponse)
+async def edit_employee_form(
     request: Request,
     employee_id: int,
-    notes: str = Form(None),
-    potential: str = Form(None),
     db: AsyncSession = Depends(get_db),
     user: str = Depends(get_current_user)
 ):
@@ -135,8 +128,55 @@ async def update_employee_notes(
     if not employee:
         raise HTTPException(status_code=404, detail="Employee not found")
         
-    employee.notes = notes
+    return templates.TemplateResponse(
+        request=request, 
+        name="employees/edit.html", 
+        context={"employee": employee, "user": user}
+    )
+
+@router.post("/{employee_id}/edit", response_class=HTMLResponse)
+async def update_employee(
+    request: Request,
+    employee_id: int,
+    name: str = Form(...),
+    role: str = Form(...),
+    email: str = Form(...),
+    skills: str = Form(""),
+    potential: str = Form(None),
+    development_plan: str = Form(None),
+    new_note: str = Form(None),
+    db: AsyncSession = Depends(get_db),
+    user: str = Depends(get_current_user)
+):
+    result = await db.execute(select(Employee).filter(Employee.id == employee_id))
+    employee = result.scalar_one_or_none()
+    
+    if not employee:
+        raise HTTPException(status_code=404, detail="Employee not found")
+        
+    employee.name = name
+    employee.role = role
+    employee.email = email
+    employee.skills = [s.strip() for s in skills.split(",") if s.strip()]
     employee.potential = potential
+    employee.development_plan = development_plan
+    
+    if new_note and new_note.strip():
+        # Append to existing notes list
+        # Ensure we are working with a list
+        current_notes = list(employee.notes) if employee.notes else []
+        current_notes.append(new_note.strip())
+        employee.notes = current_notes
         
     await db.commit()
     return RedirectResponse(url=f"/employees/{employee_id}", status_code=status.HTTP_303_SEE_OTHER)
+
+@router.post("/{employee_id}/delete")
+async def delete_employee(
+    employee_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: str = Depends(get_current_user)
+):
+    await db.execute(delete(Employee).where(Employee.id == employee_id))
+    await db.commit()
+    return RedirectResponse(url="/employees", status_code=status.HTTP_303_SEE_OTHER)

@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, status, Request, Form, BackgroundTasks
+from fastapi import APIRouter, Depends, status, Request, Form, BackgroundTasks, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 from pathlib import Path
 from typing import Optional, Dict
 import uuid
@@ -64,6 +65,32 @@ async def create_goal(
     db.add(goal)
     await db.commit()
     return RedirectResponse(url="/goals", status_code=status.HTTP_303_SEE_OTHER)
+
+@router.get("/{goal_id}", response_class=HTMLResponse)
+async def goal_detail(
+    request: Request,
+    goal_id: int,
+    db: AsyncSession = Depends(get_db),
+    user: str = Depends(get_current_user)
+):
+    result = await db.execute(
+        select(Goal)
+        .options(selectinload(Goal.employee), selectinload(Goal.project))
+        .filter(Goal.id == goal_id)
+    )
+    goal = result.scalar_one_or_none()
+    
+    if not goal:
+        raise HTTPException(status_code=404, detail="Goal not found")
+        
+    return templates.TemplateResponse(
+        request=request,
+        name="goals/detail.html",
+        context={
+            "goal": goal,
+            "user": user
+        }
+    )
 
 async def run_goal_generation_task(task_id: str, employee_id: int, project_id: int, db_session_factory):
     # We need a fresh session here if we were passing db, but we passed factory or just use IDs and get data.

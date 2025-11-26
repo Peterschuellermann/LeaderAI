@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded shadow">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Edit Employee: {{ employee.name }}</h2>
+    
+    {% if error %}
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">
+        <span class="block sm:inline">{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <form action="/employees/{{ employee.id }}/edit" method="post">
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Name</label>
+            <input required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="name" name="name" type="text" value="{{ employee.name }}">
+        </div>
+        
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="role">Role</label>
+            <input required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="role" name="role" type="text" value="{{ employee.role }}">
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="email">Email</label>
+            <input required class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="email" name="email" type="email" value="{{ employee.email }}">
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="skills">Skills (comma separated)</label>
+            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="skills" name="skills" type="text" value="{{ employee.skills | join(', ') }}">
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="potential">Potential Rating</label>
+            <select class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="potential" name="potential">
+                <option value="">Select Potential...</option>
+                <option value="P1" {% if employee.potential == 'P1' %}selected{% endif %}>P1 - High Potential / Strategic</option>
+                <option value="P2" {% if employee.potential == 'P2' %}selected{% endif %}>P2 - Potential / Needs Skills</option>
+                <option value="P3" {% if employee.potential == 'P3' %}selected{% endif %}>P3 - Steady Performer</option>
+                <option value="P4" {% if employee.potential == 'P4' %}selected{% endif %}>P4 - Underperformer</option>
+            </select>
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-gray-700 text-sm font-bold mb-2">Performance & Notes History</label>
+            <div class="bg-gray-50 rounded p-4 mb-2 max-h-60 overflow-y-auto">
+                {% if employee.notes %}
+                    <ul class="list-disc list-inside space-y-2">
+                        {% for note in employee.notes %}
+                            <li class="text-sm text-gray-700">{{ note }}</li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-gray-500 text-sm">No notes recorded.</p>
+                {% endif %}
+            </div>
+            
+            <label class="block text-gray-700 text-sm font-bold mb-2 mt-4" for="new_note">Add New Note</label>
+            <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="new_note" name="new_note" rows="3" placeholder="Add a new performance note..."></textarea>
+        </div>
+
+        <div class="mb-6">
+            <label class="block text-gray-700 text-sm font-bold mb-2" for="development_plan">Development Plan</label>
+            <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="development_plan" name="development_plan" rows="5">{{ employee.development_plan or '' }}</textarea>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                Save Changes
+            </button>
+            <a href="/employees/{{ employee.id }}" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

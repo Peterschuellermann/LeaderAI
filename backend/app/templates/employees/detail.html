@@ -7,8 +7,11 @@
             <h3 class="text-lg leading-6 font-medium text-gray-900">Employee Details</h3>
             <p class="mt-1 max-w-2xl text-sm text-gray-500">Personal details and application.</p>
         </div>
-        <div>
-             <form action="/employees/{{ employee.id }}/delete" method="post" onsubmit="return confirm('Are you sure?');">
+        <div class="flex space-x-2">
+            <a href="/employees/{{ employee.id }}/edit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-sm">
+                Edit
+            </a>
+            <form action="/employees/{{ employee.id }}/delete" method="post" onsubmit="return confirm('Are you sure?');">
                 <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded text-sm">
                     Delete
                 </button>
@@ -42,31 +45,24 @@
             <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                 <dt class="text-sm font-medium text-gray-500">Performance & Notes</dt>
                 <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                    <form action="/employees/{{ employee.id }}/notes" method="post">
-                        <div class="mb-4 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-                            <div class="sm:col-span-3">
-                                <label for="potential" class="block text-xs font-medium text-gray-700 uppercase mb-1">Potential</label>
-                                <select id="potential" name="potential" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
-                                    <option value="">Select...</option>
-                                    <option value="P1" {% if employee.potential == 'P1' %}selected{% endif %}>P1 - High Potential</option>
-                                    <option value="P2" {% if employee.potential == 'P2' %}selected{% endif %}>P2 - Needs Skills</option>
-                                    <option value="P3" {% if employee.potential == 'P3' %}selected{% endif %}>P3 - Steady</option>
-                                    <option value="P4" {% if employee.potential == 'P4' %}selected{% endif %}>P4 - Underperformer</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-4">
-                             <label for="notes" class="block text-xs font-medium text-gray-700 uppercase mb-1">Notes</label>
-                             <textarea id="notes" name="notes" rows="3" class="shadow-sm focus:ring-blue-500 focus:border-blue-500 block w-full sm:text-sm border border-gray-300 rounded-md p-2">{{ employee.notes or '' }}</textarea>
-                        </div>
-                        
-                        <div class="text-right">
-                            <button type="submit" class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                Update Notes & Potential
-                            </button>
-                        </div>
-                    </form>
+                    <div class="mb-4">
+                        <span class="text-xs font-medium text-gray-500 uppercase">Potential:</span>
+                        <span class="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                            {{ employee.potential or 'Not Set' }}
+                        </span>
+                    </div>
+                    <div>
+                        <span class="text-xs font-medium text-gray-500 uppercase block mb-2">Notes History:</span>
+                        {% if employee.notes %}
+                        <ul class="list-disc list-inside space-y-1">
+                            {% for note in employee.notes %}
+                            <li class="text-sm text-gray-700">{{ note }}</li>
+                            {% endfor %}
+                        </ul>
+                        {% else %}
+                        <span class="text-sm text-gray-500">No notes recorded.</span>
+                        {% endif %}
+                    </div>
                 </dd>
             </div>
             <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -98,26 +94,34 @@
                 <dt class="text-sm font-medium text-gray-500">Goals</dt>
                 <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                     {% if employee.goals %}
-                    <ul class="border border-gray-200 rounded-md divide-y divide-gray-200">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         {% for goal in employee.goals %}
-                        <li class="pl-3 pr-4 py-3 flex items-center justify-between text-sm">
-                            <div class="w-0 flex-1 flex items-center">
-                                <span class="ml-2 flex-1 w-0 truncate">
-                                    <span class="font-medium">{{ goal.title }}</span>
-                                    <p class="text-gray-500 mt-1">{{ goal.description }}</p>
-                                </span>
+                        <a href="/goals/{{ goal.id }}" class="block hover:bg-gray-50 transition duration-150 ease-in-out group">
+                            <div class="border border-gray-200 rounded-md p-4 h-full group-hover:border-blue-400 group-hover:shadow-sm">
+                                <div class="flex justify-between items-start">
+                                    <h4 class="text-sm font-bold text-gray-900 group-hover:text-blue-600">{{ goal.title }}</h4>
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                        {% if goal.status == 'Achieved' %}bg-green-100 text-green-800
+                                        {% elif goal.status == 'In Progress' %}bg-yellow-100 text-yellow-800
+                                        {% elif goal.status == 'Blocked' %}bg-red-100 text-red-800
+                                        {% else %}bg-gray-100 text-gray-800{% endif %}">
+                                        {{ goal.status }}
+                                    </span>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-2 line-clamp-2">{{ goal.description }}</p>
+                                {% if goal.due_date %}
+                                <p class="text-xs text-gray-400 mt-2">Due: {{ goal.due_date }}</p>
+                                {% endif %}
+                                {% if goal.manager_support %}
+                                <div class="mt-2 pt-2 border-t border-gray-100 flex items-center text-orange-600">
+                                    <svg class="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                    <span class="text-xs font-medium">Needs Support</span>
+                                </div>
+                                {% endif %}
                             </div>
-                            <div class="ml-4 flex-shrink-0">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                    {% if goal.status == 'Achieved' %}bg-green-100 text-green-800
-                                    {% elif goal.status == 'In Progress' %}bg-yellow-100 text-yellow-800
-                                    {% else %}bg-gray-100 text-gray-800{% endif %}">
-                                    {{ goal.status }}
-                                </span>
-                            </div>
-                        </li>
+                        </a>
                         {% endfor %}
-                    </ul>
+                    </div>
                     {% else %}
                     <span class="text-gray-500">No goals set.</span>
                     {% endif %}

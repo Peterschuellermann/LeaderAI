@@ -150,6 +150,9 @@ async def test_employee_integration(db_session, override_get_db):
     # but detail page definitely should.
     
     # 6. Check Detail Page
+    # Expunge all to ensure we get fresh data (re-fetch) in the shared test session
+    db_session.expunge_all()
+    
     response = client.get(f"/employees/{emp.id}")
     assert response.status_code == 200
     assert "Integration User" in response.text

@@ -14,7 +14,7 @@ class Employee(Base):
     email: Mapped[str] = mapped_column(String, unique=True, index=True)
     skills: Mapped[List[str]] = mapped_column(JSON, default=list)
     development_plan: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
-    notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    notes: Mapped[List[str]] = mapped_column(JSON, default=list)
     potential: Mapped[Optional[str]] = mapped_column(String, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), onupdate=func.now())

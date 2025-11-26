@@ -1,0 +1,83 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+        <div>
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Goal Details</h3>
+            <p class="mt-1 max-w-2xl text-sm text-gray-500">Tracking objectives and key results.</p>
+        </div>
+        <div class="flex space-x-2">
+            <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full 
+                {% if goal.status == 'Achieved' %}bg-green-100 text-green-800
+                {% elif goal.status == 'In Progress' %}bg-yellow-100 text-yellow-800
+                {% elif goal.status == 'Blocked' %}bg-red-100 text-red-800
+                {% else %}bg-gray-100 text-gray-800{% endif %}">
+                {{ goal.status }}
+            </span>
+        </div>
+    </div>
+    <div class="border-t border-gray-200">
+        <dl>
+            <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Title</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 font-bold">{{ goal.title }}</dd>
+            </div>
+            
+            <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Assigned To</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    {% if goal.employee %}
+                    <a href="/employees/{{ goal.employee.id }}" class="text-blue-600 hover:underline">{{ goal.employee.name }}</a>
+                    {% else %}
+                    <span class="text-gray-500">Unassigned</span>
+                    {% endif %}
+                </dd>
+            </div>
+
+            {% if goal.project %}
+            <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Related Project</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    <a href="/projects/{{ goal.project.id }}" class="text-blue-600 hover:underline">{{ goal.project.name }}</a>
+                </dd>
+            </div>
+            {% endif %}
+
+            <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Description</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 whitespace-pre-wrap">{{ goal.description }}</dd>
+            </div>
+
+            <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Due Date</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ goal.due_date or 'Not set' }}</dd>
+            </div>
+
+            <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Success Metrics</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 whitespace-pre-wrap">{{ goal.success_metrics or 'None defined' }}</dd>
+            </div>
+
+            <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt class="text-sm font-medium text-gray-500">Manager Support Needed</dt>
+                <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 whitespace-pre-wrap text-orange-700">{{ goal.manager_support or 'None requested' }}</dd>
+            </div>
+            
+            {% if goal.ai_suggestions %}
+            <div class="bg-blue-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 border-t border-blue-100">
+                <dt class="text-sm font-medium text-blue-800">AI Suggestions</dt>
+                <dd class="mt-1 text-sm text-blue-900 sm:mt-0 sm:col-span-2 whitespace-pre-wrap">{{ goal.ai_suggestions }}</dd>
+            </div>
+            {% endif %}
+        </dl>
+    </div>
+    <div class="bg-gray-50 px-4 py-4 sm:px-6 flex justify-end">
+        {% if goal.employee %}
+        <a href="/employees/{{ goal.employee.id }}" class="text-sm font-medium text-blue-600 hover:text-blue-500">Back to Employee</a>
+        {% else %}
+        <a href="/goals" class="text-sm font-medium text-blue-600 hover:text-blue-500">Back to Goals List</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
